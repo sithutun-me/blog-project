@@ -7,10 +7,10 @@
           <h2><%= blog.title %></h2>
         </a>
           <p><%= blog.intro %></p>
+          <form action="/blogs/<%= blog._id %>/delete">
+            <button type="submit" class="blog-delete-btn">Delete</button>
+          </form>
         </div>
-        <form action="/blogs/<%= blog._id %>/delete">
-          <button type="submit" class="blog-delete-btn">Delete</button>
-        </form>
       <% }) %>
       <% }else{ %>
         <h3>There is no Blog</h3>

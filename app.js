@@ -3,12 +3,12 @@ const morgan = require('morgan');
 const expressLayouts = require('express-ejs-layouts');
 
 const app = express();
+const blogRouter = require('./route/blogRoutes');
 
 app.use(express.urlencoded({ extended: true })); //Body Parser
 
 const ejs = require('ejs');
 const mongoose = require('mongoose');
-const Blog = require('./models/Blog.js');
 
 const port = 3000;
 const mongoUrl = 'mongodb://localhost:27017/blog';
@@ -39,11 +39,7 @@ app.use(morgan('dev')); //Morgan is a logging tool (middleware) that can be used
 app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
-  let blogs = await Blog.find().sort({ createdAt: -1 });
-  res.render('home', {
-    blogs,
-    title: 'Home',
-  });
+  res.redirect('/blogs');
 });
 
 app.get('/about', (req, res) => {
@@ -58,43 +54,7 @@ app.get('/contact', (req, res) => {
   });
 });
 
-app.get('/blogs/create', (req, res) => {
-  res.render('blogs/create', {
-    title: 'Blog Create',
-  });
-});
-
-app.post('/blogs', async (req, res) => {
-  let { title, intro, body } = req.body;
-  let blog = new Blog({
-    title,
-    intro,
-    body,
-  });
-  await blog.save();
-  res.redirect('/');
-});
-
-app.get('/blogs/:id/delete', async (req, res, next) => {
-  let id = req.params.id;
-  await Blog.findByIdAndDelete(id);
-  res.redirect('/');
-});
-
-app.get('/blogs/:id', async (req, res, next) => {
-  try {
-    let id = req.params.id;
-    let blog = await Blog.findById(id);
-    res.render('blogs/show', {
-      blog,
-      title: 'Blog details',
-    });
-  } catch (e) {
-    console.log(e);
-    next();
-  }
-});
-
+app.use('/blogs/', blogRouter);
 app.use((req, res) => {
   res.status(404).render('404', {
     title: '404',
